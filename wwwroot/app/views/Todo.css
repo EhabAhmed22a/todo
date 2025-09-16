@@ -1,0 +1,134 @@
+﻿<style >
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    padding: 20px;
+}
+
+.panel {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+}
+
+.input-group {
+    margin-bottom: 25px;
+}
+
+.form-control {
+    border: 1px solid #dce1e6;
+    padding: 12px;
+    border-radius: 6px 0 0 6px;
+}
+
+    .form-control:focus {
+        border-color: #4a90e2;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(74, 144, 226, 0.6);
+    }
+
+.btn-add {
+    background-color: #5cb85c; /* Fresh green */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 0 6px 6px 0;
+    transition: background-color 0.2s;
+}
+
+    .btn-add:hover {
+        background-color: #4cae4c;
+    }
+
+.table-modern {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+    .table-modern tr {
+        background-color: white;
+        transition: background-color 0.2s;
+    }
+
+        .table-modern tr:hover {
+            background-color: #f0f9ff;
+        }
+
+    .table-modern td {
+        padding: 16px 8px;
+        border-bottom: 1px solid #eaeef2;
+    }
+
+.todo-checkbox {
+    margin-right: 12px;
+    transform: scale(1.2);
+    accent-color: #4a90e2; /* Changes checkbox color */
+}
+
+.todo-complete {
+    text-decoration: line-through;
+    color: #888; /* Gray out completed items */
+}
+
+.edit-input {
+    margin-left: 10px;
+    display: inline-block;
+    width: auto;
+}
+
+.action-buttons {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.btn-link {
+    text-decoration: none;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-edit {
+    color: #f0ad4e; /* Orange */
+}
+
+    .btn-edit:hover {
+        background-color: #f0ad4e;
+        color: white;
+    }
+
+.btn-delete {
+    color: #d9534f; /* Red */
+}
+
+    .btn-delete:hover {
+        background-color: #d9534f;
+        color: white;
+    }
+
+.btn-save {
+    color: #5cb85c; /* Green */
+}
+
+    .btn-save:hover {
+        background-color: #5cb85c;
+        color: white;
+    }
+
+.btn-cancel {
+    color: #6c757d; /* Gray */
+}
+
+    .btn-cancel:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+
+.error {
+    color: #d9534f; /* Red for errors */
+    font-weight: bold;
+}
+
+</style >

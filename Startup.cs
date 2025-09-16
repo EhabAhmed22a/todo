@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using TodoApi.Models;
+using Azure.Identity;
 
 namespace TodoApi
 {
@@ -35,6 +36,7 @@ namespace TodoApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
