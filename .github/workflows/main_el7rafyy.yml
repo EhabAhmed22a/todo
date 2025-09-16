@@ -60,8 +60,8 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'el7rafyy'
-          slot-name: 'Production'
           package: .
 
           
+
 
