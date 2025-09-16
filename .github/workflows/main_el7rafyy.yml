@@ -29,81 +29,59 @@ jobs:
       - name: Publish with detailed logging
         run: dotnet publish -c Release -o ./publish --verbosity detailed
 
-      # CRITICAL DEBUG STEPS
+      # FIXED DEBUG STEPS FOR WINDOWS
       - name: Analyze publish output
         run: |
           echo "=== PUBLISH OUTPUT ANALYSIS ==="
           echo "Total files:"
-          find ./publish -type f | wc -l
-          echo "Total size:"
-          du -sh ./publish
+          (Get-ChildItem -Path ./publish -Recurse -File).Count
+          echo "Total size (MB):"
+          [math]::Round((Get-ChildItem -Path ./publish -Recurse -File | Measure-Object -Property Length -Sum).Sum / 1MB, 2)
           echo "Top 10 largest files:"
-          find ./publish -type f -exec du -h {} + | sort -rh | head -10
+          Get-ChildItem -Path ./publish -Recurse -File | Sort-Object Length -Descending | Select-Object -First 10 | Format-Table Name, @{Name="Size(MB)";Expression={[math]::Round($_.Length / 1MB, 2)}} -AutoSize
           echo "DLL files:"
-          find ./publish -name "*.dll" | head -10
+          Get-ChildItem -Path ./publish -Filter "*.dll" -Recurse | Select-Object -First 10 | Format-Table Name, Length -AutoSize
           echo "EXE files:"
-          find ./publish -name "*.exe" | head -10
+          Get-ChildItem -Path ./publish -Filter "*.exe" -Recurse | Select-Object -First 10 | Format-Table Name, Length -AutoSize
           echo "Config files:"
-          find ./publish -name "*.json" -o -name "*.config" | head -10
+          Get-ChildItem -Path ./publish -Filter "*.json" -Recurse | Select-Object -First 10
+          Get-ChildItem -Path ./publish -Filter "*.config" -Recurse | Select-Object -First 10
 
       - name: Check for essential files
         run: |
           echo "=== ESSENTIAL FILES CHECK ==="
-          [ -f "./publish/*.dll" ] && echo "✓ DLL found" || echo "✗ No DLL found"
-          [ -f "./publish/*.runtimeconfig.json" ] && echo "✓ Runtime config found" || echo "✗ No runtime config"
-          [ -f "./publish/appsettings.json" ] && echo "✓ appsettings.json found" || echo "✗ No appsettings.json"
-          [ -f "./publish/web.config" ] && echo "✓ web.config found" || echo "✗ No web.config"
+          $dllFiles = Get-ChildItem -Path ./publish -Filter "*.dll" -Recurse
+          $runtimeConfig = Get-ChildItem -Path ./publish -Filter "*.runtimeconfig.json" -Recurse
+          $appSettings = Get-ChildItem -Path ./publish -Filter "appsettings.json" -Recurse
+          $webConfig = Get-ChildItem -Path ./publish -Filter "web.config" -Recurse
+          
+          if ($dllFiles) { echo "✓ DLL found: $($dllFiles.Count) files" } else { echo "✗ No DLL found" }
+          if ($runtimeConfig) { echo "✓ Runtime config found: $($runtimeConfig.Name)" } else { echo "✗ No runtime config" }
+          if ($appSettings) { echo "✓ appsettings.json found" } else { echo "✗ No appsettings.json" }
+          if ($webConfig) { echo "✓ web.config found" } else { echo "✗ No web.config" }
+          
+          echo "Main DLL files:"
+          $dllFiles | Where-Object { $_.Name -like "*TodoApi*" -or $_.Name -like "*YourProjectName*" } | Format-Table Name, Length -AutoSize
 
       - name: Create deployment package
         run: |
           echo "Creating zip from publish folder..."
-          cd ./publish
-          zip -r ../deployment.zip .
+          Compress-Archive -Path "./publish/*" -DestinationPath "./deployment.zip" -Force
           echo "Zip created:"
-          ls -la ../deployment.zip
-          echo "Zip contents:"
-          unzip -l ../deployment.zip | head -20
+          Get-Item "./deployment.zip" | Format-Table Name, Length -AutoSize
+          echo "Zip contents (first 20 files):"
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip = [System.IO.Compression.ZipFile]::OpenRead("$(Get-Location)/deployment.zip")
+          $zip.Entries | Select-Object -First 20 | Format-Table FullName, CompressedLength, Length -AutoSize
+          $zip.Dispose()
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dotnet-app
           path: deployment.zip
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment: production
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dotnet-app
-          path: ./deploy-package
-
-      - name: Verify downloaded package
-        run: |
-          echo "Downloaded package:"
-          ls -la ./deploy-package/
-          echo "Zip contents:"
-          unzip -l ./deploy-package/deployment.zip | head -10
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'el7rafyy'
-          package: ./deploy-package/deployment.zip
-
           
+
 
 
 
